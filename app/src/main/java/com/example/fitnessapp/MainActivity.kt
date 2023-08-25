@@ -4,11 +4,19 @@ import android.annotation.SuppressLint
 import android.os.Bundle
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
+import androidx.compose.foundation.background
+import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.offset
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.layout.width
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Close
 import androidx.compose.material.icons.filled.Fastfood
@@ -49,13 +57,16 @@ import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
+import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.navigation.NavGraph.Companion.findStartDestination
 import androidx.navigation.compose.currentBackStackEntryAsState
 import androidx.navigation.compose.rememberNavController
+import com.example.fitnessapp.ui.home_screen.HomeScreen
 import com.example.fitnessapp.ui.navigation_drawer.NavigationItems
 import com.example.fitnessapp.ui.theme.FitnessAppTheme
 import com.example.fitnessapp.ui.theme.Kanit
@@ -63,7 +74,7 @@ import kotlinx.coroutines.launch
 
 @OptIn(ExperimentalMaterial3Api::class)
 class MainActivity : ComponentActivity() {
-    @SuppressLint("UnusedMaterial3ScaffoldPaddingParameter")
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContent {
@@ -86,19 +97,7 @@ class MainActivity : ComponentActivity() {
                         title = "Water",
                         selectedIcon = Icons.Default.WaterDrop,
                         unselectedIcon = Icons.Outlined.WaterDrop
-                    ),
-//                        NavigationItems(
-//                            route = "settings",
-//                            title = "Settings",
-//                            selectedIcon = Icons.Default.Settings,
-//                            unselectedIcon = Icons.Outlined.Settings
-//                        ),
-//                    NavigationItems(
-//                        route = "help",
-//                        title = "Help",
-//                        selectedIcon = Icons.Default.Help,
-//                        unselectedIcon = Icons.Outlined.Help
-//                    )
+                    )
                 )
                 val navController = rememberNavController()
                 val navBackStackEntry by navController.currentBackStackEntryAsState()
@@ -112,9 +111,8 @@ class MainActivity : ComponentActivity() {
                     color = MaterialTheme.colorScheme.background
                 ) {
                     ModalNavigationDrawer(
-                        gesturesEnabled = false,
                         drawerContent = {
-                            ModalDrawerSheet {
+                            ModalDrawerSheet(modifier = Modifier.width(315.dp)) {
                                 Spacer(modifier = Modifier.height(6.dp))
                                 IconButton(
                                     onClick = {
@@ -210,16 +208,38 @@ class MainActivity : ComponentActivity() {
                                     }
                                 },
                                 actions = {
-                                    IconButton(onClick = {  }) {
+                                    IconButton(onClick = {
+//                                            navController.navigate("settings") {
+//                                                popUpTo(navController.graph.findStartDestination().id)
+//                                                launchSingleTop = true
+//                                            }
+                                    }) {
                                         Icon(imageVector = Icons.Outlined.Settings, contentDescription = "settings")
                                     }
-                                    IconButton(onClick = {  }) {
-                                        Icon(imageVector = Icons.Outlined.AccountCircle, contentDescription = "settings")
+                                    IconButton(onClick = {
+//                                            navController.navigate("Profile") {
+//                                                popUpTo(navController.graph.findStartDestination().id)
+//                                                launchSingleTop = true
+//                                            }
+                                    }) {
+                                        Icon(
+                                            imageVector = Icons.Outlined.AccountCircle,
+                                            contentDescription = "settings",
+                                            modifier = Modifier.size(30.dp)
+                                        )
                                     }
                                 }
                             )
                         }) {
-
+                            Column(
+                                modifier = Modifier
+                                    .fillMaxWidth()
+                                    .padding(it)
+                                    .offset(y = 5.dp),
+                                Arrangement.Center
+                            ) {
+                                HomeScreen()
+                            }
                         }
                     }
                 }

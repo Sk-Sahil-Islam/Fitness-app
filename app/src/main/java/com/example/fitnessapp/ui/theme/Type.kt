@@ -13,6 +13,11 @@ val Kanit = FontFamily(
     Font(R.font.kanit_extra_light, FontWeight.ExtraLight)
 )
 
+val Bricolage = FontFamily(
+    Font(R.font.bricolage_grotesque_regular, FontWeight.Normal),
+    Font(R.font.bricolage_grotesque_bold, FontWeight.Bold)
+)
+
 // Set of Material typography styles to start with
 val Typography = Typography(
     bodyLarge = TextStyle(
