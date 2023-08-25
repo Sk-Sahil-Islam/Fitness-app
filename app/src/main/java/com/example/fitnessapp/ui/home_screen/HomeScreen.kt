@@ -11,6 +11,7 @@ import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.offset
 import androidx.compose.foundation.layout.size
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
@@ -102,13 +103,15 @@ fun Stats(
             text = caloriesBurnt.toString(),
             fontFamily = Bricolage,
             fontWeight = FontWeight.Bold,
-            fontSize = 20.sp
+            fontSize = 21.sp,
+            modifier = Modifier.offset(y = 2.dp)
         )
         Text(
             text = steps.toString(),
-            fontSize = 30.sp,
+            fontSize = 27.sp,
             fontFamily = Bricolage,
-            fontWeight = FontWeight.Bold
+            fontWeight = FontWeight.Bold,
+            modifier = Modifier.offset(y = (-5).dp)
         )
     }
 }
@@ -174,8 +177,27 @@ fun CircularProgressTracker(
                 startAngle = 270f,
                 sweepAngle = 360f * animateFloat.value,
                 useCenter = false,
+//                size = Size(width = size.width.toFloat(), size.height.toFloat()),
                 style = Stroke(strokeWidth.toPx(), cap = StrokeCap.Round)
             )
+
+//            drawArc(
+//                color = progressBackgroundColor,
+//                startAngle = 270f,
+//                sweepAngle = 360f,
+//                useCenter = false,
+////                size = Size(width = size.width.toFloat(), size.height.toFloat()),
+//                style = Stroke(strokeWidth.toPx(), cap = StrokeCap.Round),
+//
+//                )
+//            drawArc(
+//                color = progressIndicatorColor,
+//                startAngle = 270f,
+//                sweepAngle = 360f * animateFloat.value,
+//                useCenter = false,
+////                size = Size(width = size.width.toFloat(), size.height.toFloat()),
+//                style = Stroke(strokeWidth.toPx(), cap = StrokeCap.Round)
+//            )
         }
     }
 }

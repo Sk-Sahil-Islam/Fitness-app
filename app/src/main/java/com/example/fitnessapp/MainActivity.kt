@@ -214,7 +214,10 @@ class MainActivity : ComponentActivity() {
 //                                                launchSingleTop = true
 //                                            }
                                     }) {
-                                        Icon(imageVector = Icons.Outlined.Settings, contentDescription = "settings")
+                                        Icon(
+                                            imageVector = Icons.Outlined.Settings,
+                                            contentDescription = "settings"
+                                        )
                                     }
                                     IconButton(onClick = {
 //                                            navController.navigate("Profile") {
@@ -231,15 +234,7 @@ class MainActivity : ComponentActivity() {
                                 }
                             )
                         }) {
-                            Column(
-                                modifier = Modifier
-                                    .fillMaxWidth()
-                                    .padding(it)
-                                    .offset(y = 5.dp),
-                                Arrangement.Center
-                            ) {
-                                HomeScreen()
-                            }
+                            HomeScreen(modifier = Modifier.padding(it))
                         }
                     }
                 }
