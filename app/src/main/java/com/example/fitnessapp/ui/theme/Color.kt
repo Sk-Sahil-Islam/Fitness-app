@@ -1,5 +1,6 @@
 package com.example.fitnessapp.ui.theme
 
+import android.hardware.lights.Light
 import androidx.compose.ui.graphics.Color
 
 val Purple80 = Color(0xFFD0BCFF)
@@ -10,5 +11,14 @@ val Purple40 = Color(0xFF6650a4)
 val PurpleGrey40 = Color(0xFF625b71)
 val Pink40 = Color(0xFF7D5260)
 
-val trackerGrey = Color(0xFF283535)
-val trackerCaloriesColor = Color(0xFFDD3D73)
+val RosePinkGrey = Color(0xFF5C313E)
+val RosePink = Color(0xFFDD3D73)
+
+val LightRosePinkGrey = Color(0xFFDF8DA5)
+val DarkRosePink = Color(0xFFA70D41)
+
+val MyGreen = Color(0xFF89FF69)
+val MyDarkerGreen = Color(0xFF3D9B24)
+
+val MyBlue = Color(0xFF00FFFF)
+val MyDarkerBlue= Color(0xFF1B84CA)
