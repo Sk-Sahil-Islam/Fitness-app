@@ -43,6 +43,7 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.example.fitnessapp.ui.theme.Bricolage
 import com.example.fitnessapp.ui.theme.DarkRosePink
+import com.example.fitnessapp.ui.theme.Kanit
 import com.example.fitnessapp.ui.theme.LightRosePinkGrey
 import com.example.fitnessapp.ui.theme.MyBlue
 import com.example.fitnessapp.ui.theme.MyDarkerBlue
@@ -50,6 +51,7 @@ import com.example.fitnessapp.ui.theme.MyDarkerGreen
 import com.example.fitnessapp.ui.theme.MyGreen
 import com.example.fitnessapp.ui.theme.RosePink
 import com.example.fitnessapp.ui.theme.RosePinkGrey
+import com.example.fitnessapp.ui.theme.ownTypography
 
 @Composable
 fun HomeScreen(
@@ -136,6 +138,7 @@ fun Stats(
         )
     }
 }
+
 @Composable
 fun CircularProgressTracker(
     modifier: Modifier = Modifier,
@@ -149,18 +152,18 @@ fun CircularProgressTracker(
 
     val animateFloat = remember { Animatable(0f) }
 
-    LaunchedEffect(true){
+    LaunchedEffect(true) {
         animateFloat.animateTo(
             targetValue = currentValue / maxValue.toFloat(),
             animationSpec = tween(durationMillis = 2000, easing = FastOutSlowInEasing)
         )
     }
 
-    Box (
+    Box(
         contentAlignment = Alignment.Center,
         modifier = modifier.size(radius * 2f)
-    ){
-        Canvas( modifier = Modifier.size(radius * 2f)) {
+    ) {
+        Canvas(modifier = Modifier.size(radius * 2f)) {
             drawArc(
                 color = progressBackgroundColor,
                 startAngle = 270f,
@@ -168,7 +171,7 @@ fun CircularProgressTracker(
                 useCenter = false,
                 style = Stroke(strokeWidth.toPx(), cap = StrokeCap.Round),
 
-            )
+                )
             drawArc(
                 color = progressIndicatorColor,
                 startAngle = 270f,
@@ -196,14 +199,16 @@ fun StatsCard(
             containerColor = MaterialTheme.colorScheme.secondaryContainer
         )
     ) {
-        Column(modifier = Modifier
-            .padding(16.dp)
-            .fillMaxWidth()) {
+        Column(
+            modifier = Modifier
+                .padding(16.dp)
+                .fillMaxWidth()
+        ) {
             Row(
                 Modifier.fillMaxWidth(),
                 horizontalArrangement = Arrangement.SpaceAround,
                 verticalAlignment = Alignment.CenterVertically
-            ){
+            ) {
                 StatWithIcon(
                     value = steps,
                     icon = Icons.Default.DirectionsRun,
@@ -220,21 +225,8 @@ fun StatsCard(
                     tint = if (isSystemInDarkTheme()) RosePink else DarkRosePink
                 )
             }
-            Spacer(modifier = Modifier.size(16.dp))
-            Row (
-                Modifier.fillMaxWidth(),
-                horizontalArrangement = Arrangement.SpaceAround,
-                verticalAlignment = Alignment.CenterVertically
-            ){
-                StatWithUnits(
-                    value = distanceTraveled,
-                    unit = "km"
-                )
-                StatWithUnits(
-                    value = averageSpeed,
-                    unit = "km/h"
-                )
-            }
+            Spacer(modifier = Modifier.size(20.dp))
+            StatWithUnits(distanceTraveled = 11.8, averageSpeed = 4.83, unit = "km")
         }
     }
 }
@@ -246,7 +238,7 @@ fun StatWithIcon(
     tint: Color = LocalContentColor.current
 ) {
     Row(verticalAlignment = Alignment.CenterVertically) {
-        Text(text = value.toString())
+        Text(text = value.toString(), fontFamily = Bricolage, fontWeight = FontWeight.W600)
         Spacer(modifier = Modifier.size(6.dp))
         Icon(imageVector = icon, contentDescription = null, tint = tint)
     }
@@ -254,13 +246,48 @@ fun StatWithIcon(
 
 @Composable
 fun StatWithUnits(
-    value: Double,
+    distanceTraveled: Double,
+    averageSpeed: Double,
     unit: String
 ) {
     Row(verticalAlignment = Alignment.CenterVertically) {
-        Text(text = value.toString())
-        Spacer(modifier = Modifier.size(6.dp))
-        Text(text = unit)
+        Column {
+            Text(
+                text = "Distance Traveled : ",
+                style = ownTypography.bodyLarge,
+                fontWeight = FontWeight.W300
+            )
+            Spacer(modifier = Modifier.size(6.dp))
+            Text(
+                text = "Average Speed :",
+                style = ownTypography.bodyLarge,
+                fontWeight = FontWeight.W300
+            )
+
+        }
+        Spacer(modifier = Modifier.weight(1f))
+        Column {
+            Row {
+                Text(text = distanceTraveled.toString(), fontFamily = Bricolage)
+                Spacer(modifier = Modifier.size(10.dp))
+                Text(
+                    text = unit,
+                    style = ownTypography.bodyLarge,
+                    fontWeight = FontWeight.W300
+                )
+            }
+            Row {
+                Text(text = averageSpeed.toString(), fontFamily = Bricolage)
+                Spacer(modifier = Modifier.size(5.dp))
+                Text(
+                    text = "$unit/h",
+                    style = ownTypography.bodyLarge,
+                    fontWeight = FontWeight.W300
+                )
+            }
+
+        }
+
     }
 }
 
