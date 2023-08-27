@@ -6,6 +6,7 @@ import androidx.compose.animation.core.Animatable
 import androidx.compose.animation.core.FastOutSlowInEasing
 import androidx.compose.animation.core.tween
 import androidx.compose.foundation.Canvas
+import androidx.compose.foundation.background
 import androidx.compose.foundation.isSystemInDarkTheme
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
@@ -17,14 +18,21 @@ import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.offset
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.rememberScrollState
+import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.DirectionsRun
 import androidx.compose.material.icons.filled.LocalFireDepartment
 import androidx.compose.material.icons.filled.Timelapse
+import androidx.compose.material.icons.outlined.AddCircle
+import androidx.compose.material.icons.outlined.AddCircleOutline
+import androidx.compose.material.icons.outlined.RemoveCircleOutline
+import androidx.compose.material3.Button
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
+import androidx.compose.material3.IconButton
 import androidx.compose.material3.LocalContentColor
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
@@ -34,6 +42,7 @@ import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.DefaultAlpha
 import androidx.compose.ui.graphics.StrokeCap
 import androidx.compose.ui.graphics.drawscope.Stroke
 import androidx.compose.ui.graphics.vector.ImageVector
@@ -43,7 +52,6 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.example.fitnessapp.ui.theme.Bricolage
 import com.example.fitnessapp.ui.theme.DarkRosePink
-import com.example.fitnessapp.ui.theme.Kanit
 import com.example.fitnessapp.ui.theme.LightRosePinkGrey
 import com.example.fitnessapp.ui.theme.MyBlue
 import com.example.fitnessapp.ui.theme.MyDarkerBlue
@@ -57,27 +65,37 @@ import com.example.fitnessapp.ui.theme.ownTypography
 fun HomeScreen(
     modifier: Modifier = Modifier
 ) {
+    val scrollState = rememberScrollState()
     Column(
         modifier = modifier
             .fillMaxWidth()
-            .padding(16.dp),
+            .padding(start = 16.dp, end = 16.dp, bottom = 16.dp)
+            .verticalScroll(scrollState),
         horizontalAlignment = Alignment.CenterHorizontally,
-        verticalArrangement = Arrangement.Center
+        verticalArrangement = Arrangement.spacedBy(16.dp)
     ) {
-        Spacer(modifier = Modifier.size(14.dp))
+        Spacer(modifier = Modifier.height(10.dp))
         StatsIndicator(
             caloriesBurnt = 458,
             dailyCaloriesTarget = 500,
             dailyStepsTarget = 10_000,
-            steps = 5_842
+            steps = 5_842,
         )
-        Spacer(modifier = Modifier.height(45.dp))
+        Spacer(modifier = Modifier.height(24.dp))
         StatsCard(
             steps = 5_842,
             moveMin = 118,
             caloriesBurnt = 458,
             distanceTraveled = 11.8,
             averageSpeed = 4.83
+        )
+        CaloriesCard(
+            consumedCalories = 268,
+            dailyRequirement = 1647
+        )
+        WaterCard(
+            consumedWaterGlasses = 4,
+            dailyWaterGlasses = 8
         )
     }
 
@@ -226,7 +244,11 @@ fun StatsCard(
                 )
             }
             Spacer(modifier = Modifier.size(20.dp))
-            StatWithUnits(distanceTraveled = 11.8, averageSpeed = 4.83, unit = "km")
+            StatWithUnits(
+                distanceTraveled = distanceTraveled,
+                averageSpeed = averageSpeed,
+                unit = "km"
+            )
         }
     }
 }
@@ -238,8 +260,13 @@ fun StatWithIcon(
     tint: Color = LocalContentColor.current
 ) {
     Row(verticalAlignment = Alignment.CenterVertically) {
-        Text(text = value.toString(), fontFamily = Bricolage, fontWeight = FontWeight.W600)
-        Spacer(modifier = Modifier.size(6.dp))
+        Text(
+            text = value.toString(),
+            fontFamily = Bricolage,
+            fontWeight = FontWeight.W600,
+            fontSize = 18.sp
+        )
+        Spacer(modifier = Modifier.size(5.dp))
         Icon(imageVector = icon, contentDescription = null, tint = tint)
     }
 }
@@ -255,15 +282,14 @@ fun StatWithUnits(
             Text(
                 text = "Distance Traveled : ",
                 style = ownTypography.bodyLarge,
-                fontWeight = FontWeight.W300
+                fontWeight = FontWeight.W400
             )
             Spacer(modifier = Modifier.size(6.dp))
             Text(
                 text = "Average Speed :",
                 style = ownTypography.bodyLarge,
-                fontWeight = FontWeight.W300
+                fontWeight = FontWeight.W400
             )
-
         }
         Spacer(modifier = Modifier.weight(1f))
         Column {
@@ -272,22 +298,150 @@ fun StatWithUnits(
                 Spacer(modifier = Modifier.size(10.dp))
                 Text(
                     text = unit,
-                    style = ownTypography.bodyLarge,
+                    style = ownTypography.bodyMedium,
                     fontWeight = FontWeight.W300
                 )
             }
+            Spacer(modifier = Modifier.size(4.dp))
             Row {
                 Text(text = averageSpeed.toString(), fontFamily = Bricolage)
                 Spacer(modifier = Modifier.size(5.dp))
                 Text(
                     text = "$unit/h",
-                    style = ownTypography.bodyLarge,
+                    style = ownTypography.bodyMedium,
                     fontWeight = FontWeight.W300
                 )
             }
-
         }
+    }
+}
 
+@Composable
+fun CaloriesCard(
+    modifier: Modifier = Modifier,
+    consumedCalories: Int,
+    dailyRequirement: Int
+) {
+    Card(
+        onClick = {
+            /*TODO*/
+        },
+        modifier = modifier.fillMaxWidth(),
+        colors = CardDefaults.cardColors(
+            containerColor = MaterialTheme.colorScheme.secondaryContainer
+        )
+    ) {
+        Column(
+            modifier = Modifier
+                .padding(16.dp)
+                .fillMaxWidth()
+        ) {
+            Text(
+                text = "Calories",
+                style = ownTypography.titleLarge,
+                fontSize = 24.sp,
+                fontWeight = FontWeight.W600
+            )
+            Row(
+                verticalAlignment = Alignment.CenterVertically,
+                modifier = Modifier.fillMaxWidth()
+            ) {
+                Text(
+                    text = "$consumedCalories",
+                    fontFamily = Bricolage,
+                    fontSize = 25.sp
+                )
+                Spacer(modifier = Modifier.size(2.dp))
+                Text(
+                    modifier = Modifier.offset(y = 3.dp),
+                    text = "/$dailyRequirement kcal",
+                    fontFamily = Bricolage,
+                    fontSize = 16.sp,
+                    color = LocalContentColor.current.copy(alpha = 0.75f)
+                )
+                Spacer(modifier = Modifier.weight(1f))
+                Button(
+                    onClick = {
+                        //TODO:
+                    }
+                ) {
+                    Text(text = "Add")
+                }
+            }
+        }
+    }
+}
+
+@Composable
+fun WaterCard(
+    modifier: Modifier = Modifier,
+    consumedWaterGlasses: Int,
+    dailyWaterGlasses: Int
+) {
+    Card(
+        onClick = {
+            /*TODO*/
+        },
+        modifier = modifier.fillMaxWidth(),
+        colors = CardDefaults.cardColors(
+            containerColor = MaterialTheme.colorScheme.secondaryContainer
+        )
+    ) {
+        Column(
+            modifier = Modifier
+                .padding(top = 16.dp, start = 16.dp, bottom = 16.dp, end = 8.dp)
+                .fillMaxWidth()
+        ) {
+            Text(
+                text = "Water",
+                style = ownTypography.titleLarge,
+                fontSize = 24.sp,
+                fontWeight = FontWeight.W600
+            )
+            Row (
+                verticalAlignment = Alignment.CenterVertically,
+                modifier = Modifier.fillMaxWidth()
+            ){
+                Text(
+                    text = "$consumedWaterGlasses",
+                    fontFamily = Bricolage,
+                    fontSize = 25.sp
+                )
+                Spacer(modifier = Modifier.size(2.dp))
+                Text(
+                    modifier = Modifier.offset(y = 3.dp),
+                    text = "/$dailyWaterGlasses glasses",
+                    fontFamily = Bricolage,
+                    fontSize = 16.sp,
+                    color = LocalContentColor.current.copy(alpha = 0.75f)
+                )
+                Spacer(modifier = Modifier.weight(1f))
+                IconButton(
+                    onClick = {
+                        //TODO
+                    },
+                    //modifier = Modifier.background(Color.Red)
+                ) {
+                    Icon(
+                        imageVector = Icons.Outlined.RemoveCircleOutline,
+                        contentDescription = "minus water",
+                        modifier = Modifier.size(28.dp)
+                    )
+                }
+                IconButton(
+                    onClick = {
+                        //TODO
+                    },
+                    //modifier = Modifier.background(Color.Red)
+                ) {
+                    Icon(
+                        imageVector = Icons.Outlined.AddCircleOutline,
+                        contentDescription = "add water",
+                        modifier = Modifier.size(28.dp)
+                    )
+                }
+            }
+        }
     }
 }
 
