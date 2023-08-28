@@ -6,7 +6,6 @@ import androidx.compose.animation.core.Animatable
 import androidx.compose.animation.core.FastOutSlowInEasing
 import androidx.compose.animation.core.tween
 import androidx.compose.foundation.Canvas
-import androidx.compose.foundation.background
 import androidx.compose.foundation.isSystemInDarkTheme
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
@@ -24,8 +23,9 @@ import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.DirectionsRun
 import androidx.compose.material.icons.filled.LocalFireDepartment
 import androidx.compose.material.icons.filled.Timelapse
-import androidx.compose.material.icons.outlined.AddCircle
+import androidx.compose.material.icons.outlined.Add
 import androidx.compose.material.icons.outlined.AddCircleOutline
+import androidx.compose.material.icons.outlined.Edit
 import androidx.compose.material.icons.outlined.RemoveCircleOutline
 import androidx.compose.material3.Button
 import androidx.compose.material3.Card
@@ -42,7 +42,6 @@ import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.graphics.DefaultAlpha
 import androidx.compose.ui.graphics.StrokeCap
 import androidx.compose.ui.graphics.drawscope.Stroke
 import androidx.compose.ui.graphics.vector.ImageVector
@@ -52,6 +51,7 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.example.fitnessapp.ui.theme.Bricolage
 import com.example.fitnessapp.ui.theme.DarkRosePink
+import com.example.fitnessapp.ui.theme.Kanit
 import com.example.fitnessapp.ui.theme.LightRosePinkGrey
 import com.example.fitnessapp.ui.theme.MyBlue
 import com.example.fitnessapp.ui.theme.MyDarkerBlue
@@ -96,6 +96,9 @@ fun HomeScreen(
         WaterCard(
             consumedWaterGlasses = 4,
             dailyWaterGlasses = 8
+        )
+        SleepCard(
+
         )
     }
 
@@ -144,8 +147,7 @@ fun Stats(
             text = caloriesBurnt.toString(),
             fontFamily = Bricolage,
             fontWeight = FontWeight.Bold,
-            fontSize = 21.sp,
-            modifier = Modifier.offset(y = 2.dp)
+            fontSize = 21.sp
         )
         Text(
             text = steps.toString(),
@@ -278,15 +280,18 @@ fun StatWithUnits(
     unit: String
 ) {
     Row(verticalAlignment = Alignment.CenterVertically) {
-        Column {
+        Column(
+            verticalArrangement = Arrangement.Center,
+
+        ) {
             Text(
-                text = "Distance Traveled : ",
+                text = "Distance Traveled ",
                 style = ownTypography.bodyLarge,
                 fontWeight = FontWeight.W400
             )
             Spacer(modifier = Modifier.size(6.dp))
             Text(
-                text = "Average Speed :",
+                text = "Average Speed",
                 style = ownTypography.bodyLarge,
                 fontWeight = FontWeight.W400
             )
@@ -365,7 +370,9 @@ fun CaloriesCard(
                         //TODO:
                     }
                 ) {
-                    Text(text = "Add")
+                    Text(text = "Add", fontSize = 16.sp)
+                    Spacer(modifier = Modifier.size(4.dp))
+                    Icon(imageVector = Icons.Outlined.Add, contentDescription = "add")
                 }
             }
         }
@@ -389,7 +396,7 @@ fun WaterCard(
     ) {
         Column(
             modifier = Modifier
-                .padding(top = 16.dp, start = 16.dp, bottom = 16.dp, end = 8.dp)
+                .padding(16.dp)
                 .fillMaxWidth()
         ) {
             Text(
@@ -398,10 +405,10 @@ fun WaterCard(
                 fontSize = 24.sp,
                 fontWeight = FontWeight.W600
             )
-            Row (
+            Row(
                 verticalAlignment = Alignment.CenterVertically,
                 modifier = Modifier.fillMaxWidth()
-            ){
+            ) {
                 Text(
                     text = "$consumedWaterGlasses",
                     fontFamily = Bricolage,
@@ -420,25 +427,82 @@ fun WaterCard(
                     onClick = {
                         //TODO
                     },
-                    //modifier = Modifier.background(Color.Red)
                 ) {
                     Icon(
                         imageVector = Icons.Outlined.RemoveCircleOutline,
                         contentDescription = "minus water",
-                        modifier = Modifier.size(28.dp)
+                        modifier = Modifier.size(33.dp)
                     )
                 }
                 IconButton(
                     onClick = {
                         //TODO
                     },
-                    //modifier = Modifier.background(Color.Red)
                 ) {
                     Icon(
                         imageVector = Icons.Outlined.AddCircleOutline,
                         contentDescription = "add water",
-                        modifier = Modifier.size(28.dp)
+                        modifier = Modifier.size(33.dp)
                     )
+                }
+                //Spacer(modifier = Modifier.size(4.dp))
+            }
+        }
+    }
+}
+
+@Composable
+fun SleepCard(
+    modifier: Modifier = Modifier,
+    hoursOfSleep: Int = 8
+) {
+    Card(
+        onClick = {
+            /*TODO*/
+        },
+        modifier = modifier.fillMaxWidth(),
+        colors = CardDefaults.cardColors(
+            containerColor = MaterialTheme.colorScheme.secondaryContainer
+        )
+    ) {
+        Column(
+            modifier = Modifier
+                .padding(16.dp)
+                .fillMaxWidth()
+        ) {
+            Text(
+                text = "Hours of sleep",
+                style = ownTypography.titleLarge,
+                fontSize = 24.sp,
+                fontWeight = FontWeight.W600
+            )
+            Row(
+                verticalAlignment = Alignment.CenterVertically,
+                horizontalArrangement = Arrangement.Center,
+                modifier = Modifier.fillMaxWidth()
+            ) {
+                Text(
+                    text = "$hoursOfSleep",
+                    fontFamily = Bricolage,
+                    fontSize = 25.sp
+                )
+                Spacer(modifier = Modifier.size(2.dp))
+                Text(
+                    modifier = Modifier.offset(y = 3.dp),
+                    text = "(Recommended)",
+                    fontFamily = Kanit,
+                    fontSize = 16.sp,
+                    color = LocalContentColor.current.copy(alpha = 0.75f)
+                )
+                Spacer(modifier = Modifier.weight(1f))
+                Button(
+                    onClick = {
+                        /*TODO*/
+                    },
+                ) {
+                    Text(text = "Edit", fontSize = 16.sp)
+                    Spacer(modifier = Modifier.size(4.dp))
+                    Icon(imageVector = Icons.Outlined.Edit, contentDescription = "edit", modifier = Modifier.size(20.dp))
                 }
             }
         }
