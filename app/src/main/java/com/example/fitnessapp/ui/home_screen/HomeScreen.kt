@@ -10,8 +10,10 @@ import androidx.compose.foundation.isSystemInDarkTheme
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.IntrinsicSize
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.offset
@@ -20,9 +22,8 @@ import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.DirectionsRun
+import androidx.compose.material.icons.filled.AccessTimeFilled
 import androidx.compose.material.icons.filled.LocalFireDepartment
-import androidx.compose.material.icons.filled.Timelapse
 import androidx.compose.material.icons.outlined.Add
 import androidx.compose.material.icons.outlined.AddCircleOutline
 import androidx.compose.material.icons.outlined.Edit
@@ -45,10 +46,12 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.StrokeCap
 import androidx.compose.ui.graphics.drawscope.Stroke
 import androidx.compose.ui.graphics.vector.ImageVector
+import androidx.compose.ui.res.vectorResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import com.example.fitnessapp.R
 import com.example.fitnessapp.ui.theme.Bricolage
 import com.example.fitnessapp.ui.theme.DarkRosePink
 import com.example.fitnessapp.ui.theme.Kanit
@@ -231,12 +234,12 @@ fun StatsCard(
             ) {
                 StatWithIcon(
                     value = steps,
-                    icon = Icons.Default.DirectionsRun,
+                    icon = ImageVector.vectorResource(id = R.drawable.ic_filled_steps),
                     tint = if (isSystemInDarkTheme()) MyGreen else MyDarkerGreen
                 )
                 StatWithIcon(
                     value = moveMin,
-                    icon = Icons.Default.Timelapse,
+                    icon = Icons.Default.AccessTimeFilled,
                     tint = if (isSystemInDarkTheme()) MyBlue else MyDarkerBlue
                 )
                 StatWithIcon(
@@ -266,9 +269,9 @@ fun StatWithIcon(
             text = value.toString(),
             fontFamily = Bricolage,
             fontWeight = FontWeight.W600,
-            fontSize = 18.sp
+            fontSize = 20.sp
         )
-        Spacer(modifier = Modifier.size(5.dp))
+        Spacer(modifier = Modifier.size(6.dp))
         Icon(imageVector = icon, contentDescription = null, tint = tint)
     }
 }
@@ -279,7 +282,10 @@ fun StatWithUnits(
     averageSpeed: Double,
     unit: String
 ) {
-    Row(verticalAlignment = Alignment.CenterVertically) {
+    Row(
+        verticalAlignment = Alignment.CenterVertically,
+        modifier = Modifier.height(IntrinsicSize.Min)
+    ) {
         Column(
             verticalArrangement = Arrangement.Center,
 
@@ -297,24 +303,37 @@ fun StatWithUnits(
             )
         }
         Spacer(modifier = Modifier.weight(1f))
-        Column {
-            Row {
-                Text(text = distanceTraveled.toString(), fontFamily = Bricolage)
-                Spacer(modifier = Modifier.size(10.dp))
+
+        Column(
+            modifier = Modifier.fillMaxHeight(),
+            verticalArrangement = Arrangement.SpaceBetween
+        ) {
+            Row(verticalAlignment = Alignment.Bottom) {
+                Text(
+                    text = distanceTraveled.toString(),
+                    fontFamily = Bricolage,
+                    fontSize = 18.sp,
+                    modifier = Modifier.offset(y = 3.dp)
+                )
+                Spacer(modifier = Modifier.size(5.dp))
                 Text(
                     text = unit,
                     style = ownTypography.bodyMedium,
-                    fontWeight = FontWeight.W300
+                    color = LocalContentColor.current.copy(alpha = 0.75f),
                 )
             }
-            Spacer(modifier = Modifier.size(4.dp))
-            Row {
-                Text(text = averageSpeed.toString(), fontFamily = Bricolage)
+            Row(verticalAlignment = Alignment.Bottom) {
+                Text(
+                    text = averageSpeed.toString(),
+                    fontFamily = Bricolage,
+                    fontSize = 18.sp,
+                    modifier = Modifier.offset(y = 3.dp)
+                )
                 Spacer(modifier = Modifier.size(5.dp))
                 Text(
                     text = "$unit/h",
                     style = ownTypography.bodyMedium,
-                    fontWeight = FontWeight.W300
+                    color = LocalContentColor.current.copy(alpha = 0.75f)
                 )
             }
         }
@@ -417,10 +436,17 @@ fun WaterCard(
                 Spacer(modifier = Modifier.size(2.dp))
                 Text(
                     modifier = Modifier.offset(y = 3.dp),
-                    text = "/$dailyWaterGlasses glasses",
+                    text = "/$dailyWaterGlasses ",
                     fontFamily = Bricolage,
                     fontSize = 16.sp,
                     color = LocalContentColor.current.copy(alpha = 0.75f)
+                )
+                Text(
+                    modifier = Modifier.offset(y = 3.dp),
+                    text = "glasses",
+                    fontFamily = Kanit,
+                    fontSize = 16.sp,
+                    color = LocalContentColor.current.copy(alpha = 0.85f)
                 )
                 Spacer(modifier = Modifier.weight(1f))
                 IconButton(
@@ -445,7 +471,6 @@ fun WaterCard(
                         modifier = Modifier.size(33.dp)
                     )
                 }
-                //Spacer(modifier = Modifier.size(4.dp))
             }
         }
     }
@@ -492,7 +517,7 @@ fun SleepCard(
                     text = "(Recommended)",
                     fontFamily = Kanit,
                     fontSize = 16.sp,
-                    color = LocalContentColor.current.copy(alpha = 0.75f)
+                    color = LocalContentColor.current.copy(alpha = 0.85f)
                 )
                 Spacer(modifier = Modifier.weight(1f))
                 Button(
@@ -502,7 +527,11 @@ fun SleepCard(
                 ) {
                     Text(text = "Edit", fontSize = 16.sp)
                     Spacer(modifier = Modifier.size(4.dp))
-                    Icon(imageVector = Icons.Outlined.Edit, contentDescription = "edit", modifier = Modifier.size(20.dp))
+                    Icon(
+                        imageVector = Icons.Outlined.Edit,
+                        contentDescription = "edit",
+                        modifier = Modifier.size(20.dp)
+                    )
                 }
             }
         }
