@@ -4,18 +4,25 @@ import androidx.compose.material3.Typography
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.font.Font
 import androidx.compose.ui.text.font.FontFamily
+import androidx.compose.ui.text.font.FontStyle
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.sp
 import com.example.fitnessapp.R
 
 val Kanit = FontFamily(
     Font(R.font.kanit_thin, FontWeight.Thin),
-    Font(R.font.kanit_extra_light, FontWeight.ExtraLight)
+    Font(R.font.kanit_extra_light, FontWeight.ExtraLight),
+    Font(R.font.kanit_bold_italic, FontWeight.Bold, style = FontStyle.Italic),
+    Font(R.font.kanit_light_italic, FontWeight.Light, style = FontStyle.Italic)
 )
 
 val Bricolage = FontFamily(
     Font(R.font.bricolage_grotesque_regular, FontWeight.Normal),
     Font(R.font.bricolage_grotesque_bold, FontWeight.Bold)
+)
+
+val Kalam = FontFamily(
+    Font(R.font.kalam_light, FontWeight.Light)
 )
 
 // Set of Material typography styles to start with

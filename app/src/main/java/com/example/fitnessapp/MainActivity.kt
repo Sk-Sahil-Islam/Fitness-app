@@ -1,15 +1,12 @@
 package com.example.fitnessapp
 
-import android.annotation.SuppressLint
 import android.os.Bundle
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.compose.foundation.background
-import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Spacer
-import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
@@ -21,21 +18,15 @@ import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Close
 import androidx.compose.material.icons.filled.Fastfood
 import androidx.compose.material.icons.filled.Help
-import androidx.compose.material.icons.filled.LocalDining
 import androidx.compose.material.icons.filled.LocalFireDepartment
-import androidx.compose.material.icons.filled.Menu
-import androidx.compose.material.icons.filled.Settings
 import androidx.compose.material.icons.filled.WaterDrop
 import androidx.compose.material.icons.outlined.AccountCircle
 import androidx.compose.material.icons.outlined.Fastfood
-import androidx.compose.material.icons.outlined.Help
 import androidx.compose.material.icons.outlined.HelpOutline
-import androidx.compose.material.icons.outlined.LocalDining
 import androidx.compose.material.icons.outlined.LocalFireDepartment
 import androidx.compose.material.icons.outlined.Menu
 import androidx.compose.material.icons.outlined.Settings
 import androidx.compose.material.icons.outlined.WaterDrop
-import androidx.compose.material.icons.sharp.Menu
 import androidx.compose.material3.DrawerValue
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
@@ -53,23 +44,22 @@ import androidx.compose.material3.rememberDrawerState
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableIntStateOf
-import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.text.font.FontStyle
 import androidx.compose.ui.text.font.FontWeight
-import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
-import androidx.navigation.NavGraph.Companion.findStartDestination
+import androidx.compose.ui.unit.sp
 import androidx.navigation.compose.currentBackStackEntryAsState
 import androidx.navigation.compose.rememberNavController
 import com.example.fitnessapp.ui.home_screen.HomeScreen
 import com.example.fitnessapp.ui.navigation_drawer.NavigationItems
 import com.example.fitnessapp.ui.theme.FitnessAppTheme
 import com.example.fitnessapp.ui.theme.Kanit
+import com.example.fitnessapp.ui.theme.Kalam
 import kotlinx.coroutines.launch
 
 @OptIn(ExperimentalMaterial3Api::class)
@@ -127,11 +117,22 @@ class MainActivity : ComponentActivity() {
                                         contentDescription = "close"
                                     )
                                 }
-                                Spacer(modifier = Modifier.height(10.dp))
+                                MotivationalQuotes(
+                                    quote = "Our greatest weakness lies in giving up." +
+                                            " The most certain way to succeed" +
+                                            "is always to try just one more time.",
+                                    author = "Thomas Edison"
+                                )
+                                Box (modifier = Modifier.fillMaxWidth()
+                                    .padding(horizontal = 24.dp, vertical = 16.dp)
+                                    .height(1.dp)
+                                    .background(MaterialTheme.colorScheme.onSurface.copy(alpha = 0.05f))
+                                    )
+                                Spacer(modifier = Modifier.height(16.dp))
                                 items.forEachIndexed { index, item ->
                                     NavigationDrawerItem(
                                         label = {
-                                            Text(text = item.title)
+                                            Text(text = item.title, fontFamily = Kanit, fontSize = 16.sp, fontWeight = FontWeight.Bold)
                                         },
                                         //selected = item.route == navBackStackEntry?.destination?.route,
                                         selected = index == selectedItemIndex,
@@ -164,7 +165,7 @@ class MainActivity : ComponentActivity() {
                                 }
                                 Spacer(modifier = Modifier.weight(1f))
                                 NavigationDrawerItem(
-                                    label = { Text(text = "Help") },
+                                    label = { Text(text = "Help", fontFamily = Kanit, fontSize = 16.sp, fontWeight = FontWeight.Bold) },
                                     selected = selectedItemIndex == 3,
                                     onClick = {
                                         selectedItemIndex = 3
@@ -243,3 +244,36 @@ class MainActivity : ComponentActivity() {
     }
 }
 
+@Composable
+fun MotivationalQuotes(
+    modifier: Modifier = Modifier,
+    quote: String,
+    author: String
+) {
+    Box(
+        modifier
+            .fillMaxWidth()
+            .padding(start = 30.dp, end = 20.dp, bottom = 20.dp)
+    ) {
+        Column(modifier.fillMaxWidth()) {
+            Text(
+                text = quote,
+                fontSize = 24.sp,
+                fontFamily = Kalam,
+                fontWeight = FontWeight.W400,
+                color = MaterialTheme.colorScheme.onSurface
+            )
+            Text(
+                text = "~ $author",
+                modifier
+                    .align(Alignment.End)
+                    .offset(x = -(15).dp),
+                fontFamily = Kanit,
+                fontWeight = FontWeight.Light,
+                fontStyle = FontStyle.Italic,
+                fontSize = 19.sp,
+                color = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.75f)
+            )
+        }
+    }
+}
