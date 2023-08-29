@@ -22,3 +22,6 @@ val MyDarkerGreen = Color(0xFF3D9B24)
 
 val MyBlue = Color(0xFF00FFFF)
 val MyDarkerBlue= Color(0xFF1B84CA)
+
+val ThemeBlue = Color(0xFF61ECFC)
+val ThemeTertiaryBlue = Color(0xFFBDF2F8)

@@ -72,7 +72,7 @@ fun HomeScreen(
     Column(
         modifier = modifier
             .fillMaxWidth()
-            .padding(start = 16.dp, end = 16.dp, bottom = 16.dp)
+            .padding(start = 16.dp, end = 16.dp)
             .verticalScroll(scrollState),
         horizontalAlignment = Alignment.CenterHorizontally,
         verticalArrangement = Arrangement.spacedBy(16.dp)
@@ -103,8 +103,8 @@ fun HomeScreen(
         SleepCard(
 
         )
+        Spacer(modifier = Modifier.size(10.dp))
     }
-
 }
 
 @Composable
@@ -216,10 +216,15 @@ fun StatsCard(
     averageSpeed: Double
 ) {
     Card(
-        onClick = { /*TODO*/ },
+        onClick = {
+            /*TODO*/
+        },
         modifier = modifier.fillMaxWidth(),
         colors = CardDefaults.cardColors(
-            containerColor = MaterialTheme.colorScheme.secondaryContainer
+            containerColor = if (isSystemInDarkTheme())
+                MaterialTheme.colorScheme.secondaryContainer.copy(alpha = 0.3f)
+            else
+                MaterialTheme.colorScheme.secondaryContainer.copy(alpha = 0.5f)
         )
     ) {
         Column(
@@ -289,7 +294,7 @@ fun StatWithUnits(
         Column(
             verticalArrangement = Arrangement.Center,
 
-        ) {
+            ) {
             Text(
                 text = "Distance Traveled ",
                 style = ownTypography.bodyLarge,
@@ -352,7 +357,10 @@ fun CaloriesCard(
         },
         modifier = modifier.fillMaxWidth(),
         colors = CardDefaults.cardColors(
-            containerColor = MaterialTheme.colorScheme.secondaryContainer
+            containerColor = if (isSystemInDarkTheme())
+                MaterialTheme.colorScheme.secondaryContainer.copy(alpha = 0.3f)
+            else
+                MaterialTheme.colorScheme.secondaryContainer.copy(alpha = 0.5f)
         )
     ) {
         Column(
@@ -410,7 +418,10 @@ fun WaterCard(
         },
         modifier = modifier.fillMaxWidth(),
         colors = CardDefaults.cardColors(
-            containerColor = MaterialTheme.colorScheme.secondaryContainer
+            containerColor = if (isSystemInDarkTheme())
+                MaterialTheme.colorScheme.secondaryContainer.copy(alpha = 0.3f)
+            else
+                MaterialTheme.colorScheme.secondaryContainer.copy(alpha = 0.5f)
         )
     ) {
         Column(
@@ -487,7 +498,10 @@ fun SleepCard(
         },
         modifier = modifier.fillMaxWidth(),
         colors = CardDefaults.cardColors(
-            containerColor = MaterialTheme.colorScheme.secondaryContainer
+            containerColor = if (isSystemInDarkTheme())
+                MaterialTheme.colorScheme.secondaryContainer.copy(alpha = 0.3f)
+            else
+                MaterialTheme.colorScheme.secondaryContainer.copy(alpha = 0.5f)
         )
     ) {
         Column(
