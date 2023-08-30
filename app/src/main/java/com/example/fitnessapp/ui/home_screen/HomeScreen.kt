@@ -1,4 +1,4 @@
-@file:OptIn(ExperimentalMaterial3Api::class, ExperimentalMaterial3Api::class)
+@file:OptIn(ExperimentalMaterial3Api::class)
 
 package com.example.fitnessapp.ui.home_screen
 
@@ -15,6 +15,7 @@ import androidx.compose.foundation.layout.IntrinsicSize
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxHeight
+import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.offset
@@ -22,6 +23,7 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.verticalScroll
+import androidx.compose.material.ExperimentalMaterialApi
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.AccessTimeFilled
 import androidx.compose.material.icons.filled.LocalFireDepartment
@@ -29,6 +31,9 @@ import androidx.compose.material.icons.outlined.Add
 import androidx.compose.material.icons.outlined.AddCircleOutline
 import androidx.compose.material.icons.outlined.Edit
 import androidx.compose.material.icons.outlined.RemoveCircleOutline
+import androidx.compose.material.pullrefresh.PullRefreshIndicator
+import androidx.compose.material.pullrefresh.pullRefresh
+import androidx.compose.material.pullrefresh.rememberPullRefreshState
 import androidx.compose.material3.Button
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
@@ -40,6 +45,8 @@ import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.collectAsState
+import androidx.compose.runtime.getValue
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -52,7 +59,9 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.hilt.navigation.compose.hiltViewModel
 import com.example.fitnessapp.R
+import com.example.fitnessapp.ui.navigation_drawer.NavigationDrawerViewModel
 import com.example.fitnessapp.ui.theme.Bricolage
 import com.example.fitnessapp.ui.theme.DarkRosePink
 import com.example.fitnessapp.ui.theme.Kanit
@@ -65,50 +74,69 @@ import com.example.fitnessapp.ui.theme.RosePink
 import com.example.fitnessapp.ui.theme.RosePinkGrey
 import com.example.fitnessapp.ui.theme.ownTypography
 
+@OptIn(ExperimentalMaterialApi::class)
 @Composable
 fun HomeScreen(
-    modifier: Modifier = Modifier
+    modifier: Modifier = Modifier,
+    viewModel: NavigationDrawerViewModel = hiltViewModel()
 ) {
-    val scrollState = rememberScrollState()
-    Column(
-        modifier = modifier
-            .fillMaxWidth()
-            .padding(start = 16.dp, end = 16.dp)
-            .verticalScroll(scrollState),
-        horizontalAlignment = Alignment.CenterHorizontally,
-        verticalArrangement = Arrangement.spacedBy(16.dp)
-    ) {
-        Spacer(modifier = Modifier.height(10.dp))
-        StatsIndicator(
-            caloriesBurnt = 458,
-            dailyCaloriesTarget = 500,
-            dailyStepsTarget = 10_000,
-            steps = 5_842,
-        )
-        Spacer(modifier = Modifier.height(24.dp))
-        StatsCard(
-            steps = 5_842,
-            moveMin = 118,
-            caloriesBurnt = 458,
-            distanceTraveled = 11.8,
-            averageSpeed = 4.83
-        )
-        CaloriesCard(
-            consumedCalories = 268,
-            dailyRequirement = 1647
-        )
-        WaterCard(
-            consumedWaterGlasses = 4,
-            dailyWaterGlasses = 8
-        )
-        SleepCard(
+    val isLoading by viewModel.isLoading.collectAsState()
+    val pullRefreshState = rememberPullRefreshState(
+        refreshing = isLoading,
+        onRefresh = { viewModel.loadDailyQuote() }
+    )
 
+    val scrollState = rememberScrollState()
+    Box(modifier = Modifier
+        .fillMaxSize()
+        .pullRefresh(pullRefreshState)) {
+
+        Column(
+            modifier = modifier
+                .fillMaxWidth()
+                .padding(start = 16.dp, end = 16.dp)
+                .verticalScroll(scrollState),
+            horizontalAlignment = Alignment.CenterHorizontally,
+            verticalArrangement = Arrangement.spacedBy(16.dp)
+        ) {
+            Spacer(modifier = Modifier.height(10.dp))
+            StatsIndicator(
+                caloriesBurnt = 458,
+                dailyCaloriesTarget = 500,
+                dailyStepsTarget = 10_000,
+                steps = 5_842,
+            )
+            Spacer(modifier = Modifier.height(24.dp))
+            StatsCard(
+                steps = 5_842,
+                moveMin = 118,
+                caloriesBurnt = 458,
+                distanceTraveled = 11.8,
+                averageSpeed = 4.83
+            )
+            CaloriesCard(
+                consumedCalories = 268,
+                dailyRequirement = 1647
+            )
+            WaterCard(
+                consumedWaterGlasses = 4,
+                dailyWaterGlasses = 8
+            )
+            SleepCard(
+
+            )
+            CaloriesBurntCard(
+                dailyCalories = 834
+            )
+            Spacer(modifier = Modifier.size(10.dp))
+        }
+        PullRefreshIndicator(
+            refreshing = isLoading,
+            state = pullRefreshState,
+            Modifier.align(Alignment.TopCenter)
         )
-        CaloriesBurntCard(
-            dailyCalories = 834
-        )
-        Spacer(modifier = Modifier.size(10.dp))
     }
+
 }
 
 @Composable

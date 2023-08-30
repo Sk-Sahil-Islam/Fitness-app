@@ -3,6 +3,7 @@ package com.example.fitnessapp
 import android.os.Bundle
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
+import androidx.activity.viewModels
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -14,6 +15,7 @@ import androidx.compose.foundation.layout.offset
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
+import androidx.compose.material.ExperimentalMaterialApi
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Close
 import androidx.compose.material.icons.filled.Fastfood
@@ -27,6 +29,10 @@ import androidx.compose.material.icons.outlined.LocalFireDepartment
 import androidx.compose.material.icons.outlined.Menu
 import androidx.compose.material.icons.outlined.Settings
 import androidx.compose.material.icons.outlined.WaterDrop
+import androidx.compose.material.pullrefresh.PullRefreshIndicator
+import androidx.compose.material.pullrefresh.pullRefresh
+import androidx.compose.material.pullrefresh.rememberPullRefreshState
+import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.DrawerValue
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
@@ -42,8 +48,11 @@ import androidx.compose.material3.Text
 import androidx.compose.material3.TopAppBar
 import androidx.compose.material3.rememberDrawerState
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableIntStateOf
+import androidx.compose.runtime.produceState
+import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
@@ -55,16 +64,22 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.navigation.compose.currentBackStackEntryAsState
 import androidx.navigation.compose.rememberNavController
+import com.example.fitnessapp.data.remote.responses.Quotes
 import com.example.fitnessapp.ui.home_screen.HomeScreen
+import com.example.fitnessapp.ui.navigation_drawer.NavigationDrawerViewModel
 import com.example.fitnessapp.ui.navigation_drawer.NavigationItems
 import com.example.fitnessapp.ui.theme.FitnessAppTheme
 import com.example.fitnessapp.ui.theme.Kanit
 import com.example.fitnessapp.ui.theme.Kalam
+import com.example.fitnessapp.util.Resource
+import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.launch
 
 @OptIn(ExperimentalMaterial3Api::class)
+@AndroidEntryPoint
 class MainActivity : ComponentActivity() {
 
+    @OptIn(ExperimentalMaterialApi::class)
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContent {
@@ -89,15 +104,22 @@ class MainActivity : ComponentActivity() {
                         unselectedIcon = Icons.Outlined.WaterDrop
                     )
                 )
-                val navController = rememberNavController()
-                val navBackStackEntry by navController.currentBackStackEntryAsState()
+
+                val viewModel: NavigationDrawerViewModel by viewModels()
+//                val navController = rememberNavController()
+//                val navBackStackEntry by navController.currentBackStackEntryAsState()
                 val drawerState = rememberDrawerState(initialValue = DrawerValue.Closed)
                 val scope = rememberCoroutineScope()
+                val isLoading by viewModel.isLoading.collectAsState()
+
+                val quote by remember { viewModel.quote }
+
                 var selectedItemIndex by rememberSaveable {
                     mutableIntStateOf(0)
                 }
                 Surface(
-                    modifier = Modifier.fillMaxSize(),
+                    modifier = Modifier
+                        .fillMaxSize(),
                     color = MaterialTheme.colorScheme.surface
                 ) {
                     ModalNavigationDrawer(
@@ -117,22 +139,44 @@ class MainActivity : ComponentActivity() {
                                         contentDescription = "close"
                                     )
                                 }
-                                MotivationalQuotes(
-                                    quote = "Our greatest weakness lies in giving up." +
-                                            " The most certain way to succeed" +
-                                            "is always to try just one more time.",
-                                    author = "Thomas Edison"
-                                )
-                                Box (modifier = Modifier.fillMaxWidth()
-                                    .padding(horizontal = 24.dp, vertical = 16.dp)
-                                    .height(1.dp)
-                                    .background(MaterialTheme.colorScheme.onSurface.copy(alpha = 0.05f))
+
+                                if (quote.q == "error" && !isLoading) {
+                                    MotivationalQuotes(
+                                        quote = "Looks like you're in need of a virtual bridge to the digital realm." +
+                                                " Don't worry," +
+                                                " I'll be here whenever you're ready to reconnect.",
+                                        author = "Dev Team"
                                     )
+                                }
+                                if (isLoading) {
+                                    Box(
+                                        contentAlignment = Alignment.Center,
+                                        modifier = Modifier.fillMaxWidth()
+                                    ) {
+                                        CircularProgressIndicator()
+                                    }
+                                }
+                                if(quote.q.isNotEmpty() && quote.a.isNotEmpty()) {
+                                    MotivationalQuotes(quote = quote.q, author = quote.a)
+                                }
+
+                                Box(
+                                    modifier = Modifier
+                                        .fillMaxWidth()
+                                        .padding(horizontal = 24.dp, vertical = 16.dp)
+                                        .height(1.dp)
+                                        .background(MaterialTheme.colorScheme.onSurface.copy(alpha = 0.05f))
+                                )
                                 Spacer(modifier = Modifier.height(16.dp))
                                 items.forEachIndexed { index, item ->
                                     NavigationDrawerItem(
                                         label = {
-                                            Text(text = item.title, fontFamily = Kanit, fontSize = 16.sp, fontWeight = FontWeight.Bold)
+                                            Text(
+                                                text = item.title,
+                                                fontFamily = Kanit,
+                                                fontSize = 16.sp,
+                                                fontWeight = FontWeight.Bold
+                                            )
                                         },
                                         //selected = item.route == navBackStackEntry?.destination?.route,
                                         selected = index == selectedItemIndex,
@@ -165,7 +209,14 @@ class MainActivity : ComponentActivity() {
                                 }
                                 Spacer(modifier = Modifier.weight(1f))
                                 NavigationDrawerItem(
-                                    label = { Text(text = "Help", fontFamily = Kanit, fontSize = 16.sp, fontWeight = FontWeight.Bold) },
+                                    label = {
+                                        Text(
+                                            text = "Help",
+                                            fontFamily = Kanit,
+                                            fontSize = 16.sp,
+                                            fontWeight = FontWeight.Bold
+                                        )
+                                    },
                                     selected = selectedItemIndex == 3,
                                     onClick = {
                                         selectedItemIndex = 3
