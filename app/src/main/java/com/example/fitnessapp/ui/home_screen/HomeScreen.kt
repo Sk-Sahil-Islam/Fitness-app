@@ -1,4 +1,4 @@
-@file:OptIn(ExperimentalMaterial3Api::class)
+@file:OptIn(ExperimentalMaterial3Api::class, ExperimentalMaterial3Api::class)
 
 package com.example.fitnessapp.ui.home_screen
 
@@ -6,6 +6,7 @@ import androidx.compose.animation.core.Animatable
 import androidx.compose.animation.core.FastOutSlowInEasing
 import androidx.compose.animation.core.tween
 import androidx.compose.foundation.Canvas
+import androidx.compose.foundation.background
 import androidx.compose.foundation.isSystemInDarkTheme
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
@@ -102,6 +103,9 @@ fun HomeScreen(
         )
         SleepCard(
 
+        )
+        CaloriesBurntCard(
+            dailyCalories = 834
         )
         Spacer(modifier = Modifier.size(10.dp))
     }
@@ -551,6 +555,77 @@ fun SleepCard(
         }
     }
 }
+
+@Composable
+fun CaloriesBurntCard(
+    modifier: Modifier = Modifier,
+    dailyCalories: Int
+) {
+    Card(
+        onClick = {
+            /*TODO*/
+        },
+        modifier = modifier.fillMaxWidth(),
+        colors = CardDefaults.cardColors(
+            containerColor = if (isSystemInDarkTheme())
+                MaterialTheme.colorScheme.secondaryContainer.copy(alpha = 0.3f)
+            else
+                MaterialTheme.colorScheme.secondaryContainer.copy(alpha = 0.5f)
+        )
+    ) {
+        Column(
+            modifier = Modifier
+                .padding(16.dp)
+                .fillMaxWidth()
+        ) {
+            Text(
+                text = "Energy expended",
+                style = ownTypography.titleLarge,
+                fontSize = 24.sp,
+                fontWeight = FontWeight.W600
+            )
+            Text(
+                text = "Last 7 days",
+                style = ownTypography.bodyLarge,
+                color = LocalContentColor.current.copy(alpha = 0.5f),
+                fontSize = 14.sp
+            )
+            Spacer(modifier = Modifier.size(6.dp))
+            Row(
+                verticalAlignment = Alignment.CenterVertically,
+                horizontalArrangement = Arrangement.SpaceBetween,
+                modifier = Modifier.fillMaxWidth()
+            ) {
+                Column {
+                    Row (verticalAlignment = Alignment.CenterVertically) {
+                        Text(
+                            text = "$dailyCalories",
+                            fontFamily = Bricolage,
+                            fontSize = 25.sp
+                        )
+                        Spacer(modifier = Modifier.size(3.dp))
+                        Text(
+                            text = "Cal",
+                            modifier = Modifier.offset(y = 3.dp),
+                            style = ownTypography.bodyLarge,
+                            color = LocalContentColor.current.copy(alpha = 0.8f)
+                        )
+                    }
+                    Text(text = "Today", fontFamily = Kanit)
+                }
+
+                Box (
+                    modifier = Modifier
+                        .size(width = 175.dp, height = 75.dp)
+                        .background(Color.Red)
+                ) {
+
+                }
+            }
+        }
+    }
+}
+
 
 
 
