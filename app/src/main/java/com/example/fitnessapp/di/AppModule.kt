@@ -1,7 +1,10 @@
 package com.example.fitnessapp.di
 
+import android.app.Application
 import com.example.fitnessapp.data.remote.FitnessApi
 import com.example.fitnessapp.repository.FitnessRepository
+import com.example.fitnessapp.sensor.MeasurableSensor
+import com.example.fitnessapp.sensor.PedometerSensor
 import com.example.fitnessapp.util.Constants
 import dagger.Module
 import dagger.Provides
@@ -40,5 +43,11 @@ object AppModule {
             setLevel(HttpLoggingInterceptor.Level.BASIC)
         })
         return builder.build()
+    }
+
+    @Provides
+    @Singleton
+    fun providePedometerSensor(app: Application): MeasurableSensor {
+        return PedometerSensor(app)
     }
 }

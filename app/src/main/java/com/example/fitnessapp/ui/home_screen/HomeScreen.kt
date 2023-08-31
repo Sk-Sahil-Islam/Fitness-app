@@ -2,6 +2,7 @@
 
 package com.example.fitnessapp.ui.home_screen
 
+import android.util.Log
 import androidx.compose.animation.core.Animatable
 import androidx.compose.animation.core.FastOutSlowInEasing
 import androidx.compose.animation.core.tween
@@ -73,18 +74,24 @@ import com.example.fitnessapp.ui.theme.MyGreen
 import com.example.fitnessapp.ui.theme.RosePink
 import com.example.fitnessapp.ui.theme.RosePinkGrey
 import com.example.fitnessapp.ui.theme.ownTypography
+import kotlinx.coroutines.delay
 
 @OptIn(ExperimentalMaterialApi::class)
 @Composable
 fun HomeScreen(
     modifier: Modifier = Modifier,
-    viewModel: NavigationDrawerViewModel = hiltViewModel()
+    navigationViewModel: NavigationDrawerViewModel = hiltViewModel(),
+    homeViewModel: HomeScreenViewModel = hiltViewModel()
 ) {
-    val isLoading by viewModel.isLoading.collectAsState()
+    val isLoading by navigationViewModel.isLoading.collectAsState()
     val pullRefreshState = rememberPullRefreshState(
         refreshing = isLoading,
-        onRefresh = { viewModel.loadDailyQuote() }
+        onRefresh = { navigationViewModel.loadDailyQuote() }
     )
+
+    //val steps by homeViewModel.totalSteps.collectAsState()
+    val steps by homeViewModel.totalSteps
+    Log.e("home steps", steps.toString())
 
     val scrollState = rememberScrollState()
     Box(modifier = Modifier
@@ -103,8 +110,8 @@ fun HomeScreen(
             StatsIndicator(
                 caloriesBurnt = 458,
                 dailyCaloriesTarget = 500,
-                dailyStepsTarget = 10_000,
-                steps = 5_842,
+                dailyStepsTarget = 20_000,
+                steps = steps,
             )
             Spacer(modifier = Modifier.height(24.dp))
             StatsCard(
@@ -206,12 +213,14 @@ fun CircularProgressTracker(
 ) {
 
     val animateFloat = remember { Animatable(0f) }
+    val percentage = if(currentValue < maxValue) currentValue / maxValue.toFloat() else 1f
 
-    LaunchedEffect(true) {
+    LaunchedEffect(percentage) {
         animateFloat.animateTo(
-            targetValue = currentValue / maxValue.toFloat(),
+            targetValue = percentage,
             animationSpec = tween(durationMillis = 2000, easing = FastOutSlowInEasing)
         )
+        Log.e("percentage in circular progress bar", percentage.toString())
     }
 
     Box(
