@@ -78,8 +78,7 @@ import kotlinx.coroutines.launch
 @OptIn(ExperimentalMaterial3Api::class)
 @AndroidEntryPoint
 class MainActivity : ComponentActivity() {
-
-    @OptIn(ExperimentalMaterialApi::class)
+    
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContent {
@@ -152,11 +151,12 @@ class MainActivity : ComponentActivity() {
                                     Box(
                                         contentAlignment = Alignment.Center,
                                         modifier = Modifier.fillMaxWidth()
+                                            .height(100.dp)
                                     ) {
                                         CircularProgressIndicator()
                                     }
                                 }
-                                if(quote.q.isNotEmpty() && quote.a.isNotEmpty()) {
+                                if(quote.q.isNotEmpty() && quote.a.isNotEmpty() && !isLoading) {
                                     MotivationalQuotes(quote = quote.q, author = quote.a)
                                 }
 
