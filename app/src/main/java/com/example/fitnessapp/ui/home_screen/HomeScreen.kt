@@ -7,7 +7,6 @@ import androidx.compose.animation.core.Animatable
 import androidx.compose.animation.core.FastOutSlowInEasing
 import androidx.compose.animation.core.tween
 import androidx.compose.foundation.Canvas
-import androidx.compose.foundation.background
 import androidx.compose.foundation.isSystemInDarkTheme
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
@@ -48,7 +47,10 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableIntStateOf
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.rememberCoroutineScope
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.rotate
@@ -61,10 +63,8 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import androidx.datastore.core.DataStore
 import androidx.hilt.navigation.compose.hiltViewModel
 import com.example.fitnessapp.R
-import com.example.fitnessapp.data.StoreDayInfo
 import com.example.fitnessapp.ui.navigation_drawer.NavigationDrawerViewModel
 import com.example.fitnessapp.ui.theme.Bricolage
 import com.example.fitnessapp.ui.theme.DarkRosePink
@@ -78,6 +78,8 @@ import com.example.fitnessapp.ui.theme.RosePink
 import com.example.fitnessapp.ui.theme.RosePinkGrey
 import com.example.fitnessapp.ui.theme.ownTypography
 import com.example.fitnessapp.util.functions.formateNumber
+import kotlinx.coroutines.delay
+import kotlinx.coroutines.launch
 import java.util.Calendar
 
 @OptIn(ExperimentalMaterialApi::class)
@@ -101,7 +103,11 @@ fun HomeScreen(
 
     val state = homeViewModel.stepState
     val previousDaySteps = if (day > 1) state.steps[day-2].currentDay else state.steps[6].currentDay
-    val todaySteps = state.steps[day - 1].currentDay - state.steps[day-2].currentDay
+    val todaySteps = state.steps[day - 1].currentDay - previousDaySteps
+    Log.d("steps in home", todaySteps.toString())
+    var caloriesBurned by remember{ mutableIntStateOf(0) }
+    caloriesBurned = homeViewModel.caloriesBurntWalking(steps = todaySteps).toInt()
+
     val scrollState = rememberScrollState()
     Box(
         modifier = Modifier
@@ -119,7 +125,7 @@ fun HomeScreen(
         ) {
             Spacer(modifier = Modifier.height(10.dp))
             StatsIndicator(
-                caloriesBurnt = 458,
+                caloriesBurnt = caloriesBurned,
                 dailyCaloriesTarget = 500,
                 dailyStepsTarget = 20_000,
                 steps = todaySteps,
@@ -129,7 +135,7 @@ fun HomeScreen(
             StatsCard(
                 steps = todaySteps,
                 moveMin = 118,
-                caloriesBurnt = 458,
+                caloriesBurnt = caloriesBurned,
                 distanceTraveled = 11.8,
                 averageSpeed = 4.83
             )
@@ -428,7 +434,7 @@ fun CaloriesCard(
                 .fillMaxWidth()
         ) {
             Text(
-                text = "Calories",
+                text = "Calories ate",
                 style = ownTypography.titleLarge,
                 fontSize = 25.sp,
                 fontWeight = FontWeight.W600
@@ -679,7 +685,7 @@ fun CaloriesBurntCard(
                 Box(
                     modifier = Modifier
                         .size(width = 175.dp, height = 75.dp)
-                        .background(Color.Red)
+//                        .background(Color.Red)
                 ) {
                 }
             }

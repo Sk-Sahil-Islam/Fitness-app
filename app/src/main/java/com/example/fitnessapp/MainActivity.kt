@@ -55,26 +55,20 @@ import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.text.font.FontStyle
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import androidx.hilt.navigation.compose.hiltViewModel
-import androidx.lifecycle.ViewModelProvider
-import com.example.fitnessapp.data.StoreDayInfo
 import com.example.fitnessapp.repository.FitnessRepository
 import com.example.fitnessapp.ui.home_screen.HomeScreen
-import com.example.fitnessapp.ui.home_screen.HomeScreenViewModel
 import com.example.fitnessapp.ui.navigation_drawer.NavigationDrawerViewModel
 import com.example.fitnessapp.ui.navigation_drawer.NavigationItems
 import com.example.fitnessapp.ui.theme.FitnessAppTheme
 import com.example.fitnessapp.ui.theme.Kanit
-import com.example.fitnessapp.ui.theme.Kalam
+import com.example.fitnessapp.ui.theme.JosefinSans
 import com.example.fitnessapp.worker.AndroidAlarmScheduler
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.launch
-import java.time.LocalDateTime
 import javax.inject.Inject
 
 @OptIn(ExperimentalMaterial3Api::class)
@@ -148,7 +142,7 @@ class MainActivity : ComponentActivity() {
                                         contentDescription = "close"
                                     )
                                 }
-
+                                Spacer(modifier = Modifier.size(5.dp))
                                 if (quote.q == "error" && !isLoading) {
                                     MotivationalQuotes(
                                         quote = "Looks like you're in need of a virtual bridge to the digital realm." +
@@ -321,9 +315,9 @@ fun MotivationalQuotes(
             Text(
                 text = "\"$quote\"",
                 fontSize = 22.sp,
-                fontFamily = Kalam,
-                fontWeight = FontWeight.W400,
-                fontStyle = FontStyle.Italic,
+                fontFamily = JosefinSans,
+                fontWeight = FontWeight.W300,
+                //fontStyle = FontStyle.Italic,
                 color = MaterialTheme.colorScheme.onSurface
             )
             Text(

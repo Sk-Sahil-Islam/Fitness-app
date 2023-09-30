@@ -21,8 +21,8 @@ val Bricolage = FontFamily(
     Font(R.font.bricolage_grotesque_bold, FontWeight.Bold)
 )
 
-val Kalam = FontFamily(
-    Font(R.font.kalam_light, FontWeight.Light)
+val JosefinSans = FontFamily(
+    Font(R.font.josefin_sans_light_italic, FontWeight.Light)
 )
 
 // Set of Material typography styles to start with

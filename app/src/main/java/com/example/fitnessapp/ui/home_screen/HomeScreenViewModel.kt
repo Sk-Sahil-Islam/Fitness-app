@@ -2,14 +2,19 @@ package com.example.fitnessapp.ui.home_screen
 
 import android.content.Context
 import android.util.Log
+import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableIntStateOf
 import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
+import androidx.compose.ui.platform.LocalContext
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.example.fitnessapp.data.StepState
 import com.example.fitnessapp.data.StoreDayInfo
+import com.example.fitnessapp.data.user_data.UserDataStore
+import com.example.fitnessapp.data.user_data.UserDetails
 import com.example.fitnessapp.db.Steps
 import com.example.fitnessapp.repository.FitnessRepository
 import com.example.fitnessapp.sensor.MeasurableSensor
@@ -36,10 +41,17 @@ class HomeScreenViewModel @Inject constructor(
     private val currentDay = calendar.get(Calendar.DAY_OF_WEEK)
     private var prevDay = 0
 
+    private val userData = UserDataStore(context)
+//    var calBurntWalking =  0
+    private var userDetails1 = UserDetails()
+
     init {
         viewModelScope.launch {
             dataStore.getPreviousDay.collectLatest {
                 prevDay = it?.toInt() ?: 0
+            }
+            userData.getUserDetails.collectLatest {
+                userDetails1 = it
             }
         }
 
@@ -56,13 +68,14 @@ class HomeScreenViewModel @Inject constructor(
         } else {
             getPreviousCurrentSteps(7)
         }
+//        calBurntWalking = caloriesBurntWalking(userDetails).toInt()
+//        Log.d("calories burned home", calBurntWalking.toString())
     }
 
     init {
         viewModelScope.launch {
             if (prevDay != currentDay && !isTableEmpty) {
                 dataStore.savePreviousDay(currentDay.toString())
-//                updatePreviousSteps(steps = stepState.steps[currentDay - 1], prevDay = stepState.steps[prevDay - 1].currentDay)
                 updateCurrentSteps(steps = stepState.steps, day = currentDay, currentDay = 0)
             }
             delay(500)
@@ -71,7 +84,6 @@ class HomeScreenViewModel @Inject constructor(
                     insertSteps(day = it + 1)
                 }
             }
-            Log.d("previous current day", prevDayCurrentSteps.toString())
             pedometerSensor.startListening()
             pedometerSensor.setOnSensorValuesChangedListener { values ->
                 val steps = values[0]
@@ -134,5 +146,10 @@ class HomeScreenViewModel @Inject constructor(
                 }
             }
         }
+    }
+
+    fun caloriesBurntWalking(userDetails: UserDetails = userDetails1, steps: Int): Double {
+        Log.d("steps", steps.toString())
+        return steps * 0.05
     }
 }
