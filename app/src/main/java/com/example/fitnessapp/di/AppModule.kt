@@ -1,7 +1,11 @@
 package com.example.fitnessapp.di
 
 import android.app.Application
+import android.content.Context
+import androidx.room.Room
 import com.example.fitnessapp.data.remote.FitnessApi
+import com.example.fitnessapp.db.StepsDao
+import com.example.fitnessapp.db.StepsDatabase
 import com.example.fitnessapp.repository.FitnessRepository
 import com.example.fitnessapp.sensor.MeasurableSensor
 import com.example.fitnessapp.sensor.PedometerSensor
@@ -9,6 +13,7 @@ import com.example.fitnessapp.util.Constants
 import dagger.Module
 import dagger.Provides
 import dagger.hilt.InstallIn
+import dagger.hilt.android.qualifiers.ApplicationContext
 import dagger.hilt.components.SingletonComponent
 import okhttp3.OkHttpClient
 import okhttp3.logging.HttpLoggingInterceptor
@@ -24,8 +29,9 @@ object AppModule {
     @Singleton
     @Provides
     fun provideFitnessRepository(
-        api: FitnessApi
-    ) = FitnessRepository(api)
+        api: FitnessApi,
+        dao: StepsDao
+    ) = FitnessRepository(api = api, dao = dao)
 
     @Singleton
     @Provides
@@ -49,5 +55,20 @@ object AppModule {
     @Singleton
     fun providePedometerSensor(app: Application): MeasurableSensor {
         return PedometerSensor(app)
+    }
+
+    @Provides
+    @Singleton
+    fun provideStepsDatabase(@ApplicationContext context: Context): StepsDatabase {
+        return Room.databaseBuilder(
+            context,
+            StepsDatabase::class.java,
+            "steps.db"
+        ).build()
+    }
+
+    @Provides
+    fun provideStepsDao(stepsDatabase: StepsDatabase): StepsDao {
+        return stepsDatabase.dao()
     }
 }

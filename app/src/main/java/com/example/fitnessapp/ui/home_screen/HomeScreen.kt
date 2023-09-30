@@ -51,6 +51,7 @@ import androidx.compose.runtime.getValue
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.rotate
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.StrokeCap
 import androidx.compose.ui.graphics.drawscope.Stroke
@@ -60,8 +61,10 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.datastore.core.DataStore
 import androidx.hilt.navigation.compose.hiltViewModel
 import com.example.fitnessapp.R
+import com.example.fitnessapp.data.StoreDayInfo
 import com.example.fitnessapp.ui.navigation_drawer.NavigationDrawerViewModel
 import com.example.fitnessapp.ui.theme.Bricolage
 import com.example.fitnessapp.ui.theme.DarkRosePink
@@ -74,29 +77,37 @@ import com.example.fitnessapp.ui.theme.MyGreen
 import com.example.fitnessapp.ui.theme.RosePink
 import com.example.fitnessapp.ui.theme.RosePinkGrey
 import com.example.fitnessapp.ui.theme.ownTypography
-import kotlinx.coroutines.delay
+import com.example.fitnessapp.util.functions.formateNumber
+import java.util.Calendar
 
 @OptIn(ExperimentalMaterialApi::class)
 @Composable
 fun HomeScreen(
     modifier: Modifier = Modifier,
     navigationViewModel: NavigationDrawerViewModel = hiltViewModel(),
-    homeViewModel: HomeScreenViewModel = hiltViewModel()
+    homeViewModel: HomeScreenViewModel = hiltViewModel(),
 ) {
+    val calendar = Calendar.getInstance()
+    val day = calendar.get(Calendar.DAY_OF_WEEK)
+
     val isLoading by navigationViewModel.isLoading.collectAsState()
     val pullRefreshState = rememberPullRefreshState(
         refreshing = isLoading,
-        onRefresh = { navigationViewModel.loadDailyQuote() }
+        onRefresh = {
+            navigationViewModel.loadDailyQuote()
+            homeViewModel.getSteps()
+        }
     )
 
-    //val steps by homeViewModel.totalSteps.collectAsState()
-    val steps by homeViewModel.totalSteps
-    Log.e("home steps", steps.toString())
-
+    val state = homeViewModel.stepState
+    val previousDaySteps = if (day > 1) state.steps[day-2].currentDay else state.steps[6].currentDay
+    val todaySteps = state.steps[day - 1].currentDay - state.steps[day-2].currentDay
     val scrollState = rememberScrollState()
-    Box(modifier = Modifier
-        .fillMaxSize()
-        .pullRefresh(pullRefreshState)) {
+    Box(
+        modifier = Modifier
+            .fillMaxSize()
+            .pullRefresh(pullRefreshState)
+    ) {
 
         Column(
             modifier = modifier
@@ -111,11 +122,12 @@ fun HomeScreen(
                 caloriesBurnt = 458,
                 dailyCaloriesTarget = 500,
                 dailyStepsTarget = 20_000,
-                steps = steps,
+                steps = todaySteps,
+
             )
             Spacer(modifier = Modifier.height(24.dp))
             StatsCard(
-                steps = 5_842,
+                steps = todaySteps,
                 moveMin = 118,
                 caloriesBurnt = 458,
                 distanceTraveled = 11.8,
@@ -127,7 +139,7 @@ fun HomeScreen(
             )
             WaterCard(
                 consumedWaterGlasses = 4,
-                dailyWaterGlasses = 8
+                requireDailyWaterGlasses = 8
             )
             SleepCard(
 
@@ -186,13 +198,13 @@ fun Stats(
         verticalArrangement = Arrangement.Center
     ) {
         Text(
-            text = caloriesBurnt.toString(),
+            text = formateNumber(caloriesBurnt),
             fontFamily = Bricolage,
             fontWeight = FontWeight.Bold,
             fontSize = 21.sp
         )
         Text(
-            text = steps.toString(),
+            text = formateNumber(steps),
             fontSize = 27.sp,
             fontFamily = Bricolage,
             fontWeight = FontWeight.Bold,
@@ -213,14 +225,13 @@ fun CircularProgressTracker(
 ) {
 
     val animateFloat = remember { Animatable(0f) }
-    val percentage = if(currentValue < maxValue) currentValue / maxValue.toFloat() else 1f
+    val percentage = if (currentValue < maxValue) currentValue / maxValue.toFloat() else 1f
 
     LaunchedEffect(percentage) {
         animateFloat.animateTo(
             targetValue = percentage,
             animationSpec = tween(durationMillis = 2000, easing = FastOutSlowInEasing)
         )
-        Log.e("percentage in circular progress bar", percentage.toString())
     }
 
     Box(
@@ -247,6 +258,7 @@ fun CircularProgressTracker(
     }
 }
 
+@OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun StatsCard(
     modifier: Modifier = Modifier,
@@ -274,11 +286,14 @@ fun StatsCard(
                 .fillMaxWidth()
         ) {
             Row(
-                Modifier.fillMaxWidth(),
-                horizontalArrangement = Arrangement.SpaceAround,
+                Modifier
+                    .fillMaxWidth()
+                    .padding(horizontal = 5.dp),
+                horizontalArrangement = Arrangement.SpaceBetween,
                 verticalAlignment = Alignment.CenterVertically
             ) {
                 StatWithIcon(
+                    modifier = Modifier.rotate(-10f),
                     value = steps,
                     icon = ImageVector.vectorResource(id = R.drawable.ic_filled_steps),
                     tint = if (isSystemInDarkTheme()) MyGreen else MyDarkerGreen
@@ -306,19 +321,20 @@ fun StatsCard(
 
 @Composable
 fun StatWithIcon(
+    modifier: Modifier = Modifier,
     value: Int,
     icon: ImageVector,
     tint: Color = LocalContentColor.current
 ) {
     Row(verticalAlignment = Alignment.CenterVertically) {
         Text(
-            text = value.toString(),
+            text = formateNumber(value),
             fontFamily = Bricolage,
             fontWeight = FontWeight.W600,
             fontSize = 20.sp
         )
         Spacer(modifier = Modifier.size(6.dp))
-        Icon(imageVector = icon, contentDescription = null, tint = tint)
+        Icon(imageVector = icon, contentDescription = null, tint = tint, modifier = modifier)
     }
 }
 
@@ -337,15 +353,15 @@ fun StatWithUnits(
 
             ) {
             Text(
-                text = "Distance Traveled ",
+                text = "Distance",
                 style = ownTypography.bodyLarge,
-                fontWeight = FontWeight.W400
+                fontWeight = FontWeight.W500
             )
             Spacer(modifier = Modifier.size(6.dp))
             Text(
-                text = "Average Speed",
+                text = "Avg. Speed",
                 style = ownTypography.bodyLarge,
-                fontWeight = FontWeight.W400
+                fontWeight = FontWeight.W500
             )
         }
         Spacer(modifier = Modifier.weight(1f))
@@ -364,6 +380,7 @@ fun StatWithUnits(
                 Spacer(modifier = Modifier.size(5.dp))
                 Text(
                     text = unit,
+                    fontSize = 11.125.sp,
                     style = ownTypography.bodyMedium,
                     color = LocalContentColor.current.copy(alpha = 0.75f),
                 )
@@ -378,6 +395,7 @@ fun StatWithUnits(
                 Spacer(modifier = Modifier.size(5.dp))
                 Text(
                     text = "$unit/h",
+                    fontSize = 11.125.sp,
                     style = ownTypography.bodyMedium,
                     color = LocalContentColor.current.copy(alpha = 0.75f)
                 )
@@ -412,7 +430,7 @@ fun CaloriesCard(
             Text(
                 text = "Calories",
                 style = ownTypography.titleLarge,
-                fontSize = 24.sp,
+                fontSize = 25.sp,
                 fontWeight = FontWeight.W600
             )
             Row(
@@ -429,7 +447,7 @@ fun CaloriesCard(
                     modifier = Modifier.offset(y = 3.dp),
                     text = "/$dailyRequirement kcal",
                     fontFamily = Bricolage,
-                    fontSize = 16.sp,
+                    fontSize = 15.451.sp,
                     color = LocalContentColor.current.copy(alpha = 0.75f)
                 )
                 Spacer(modifier = Modifier.weight(1f))
@@ -447,11 +465,12 @@ fun CaloriesCard(
     }
 }
 
+@OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun WaterCard(
     modifier: Modifier = Modifier,
     consumedWaterGlasses: Int,
-    dailyWaterGlasses: Int
+    requireDailyWaterGlasses: Int
 ) {
     Card(
         onClick = {
@@ -473,7 +492,7 @@ fun WaterCard(
             Text(
                 text = "Water",
                 style = ownTypography.titleLarge,
-                fontSize = 24.sp,
+                fontSize = 25.sp,
                 fontWeight = FontWeight.W600
             )
             Row(
@@ -488,16 +507,16 @@ fun WaterCard(
                 Spacer(modifier = Modifier.size(2.dp))
                 Text(
                     modifier = Modifier.offset(y = 3.dp),
-                    text = "/$dailyWaterGlasses ",
+                    text = "/$requireDailyWaterGlasses ",
                     fontFamily = Bricolage,
-                    fontSize = 16.sp,
+                    fontSize = 15.451.sp,
                     color = LocalContentColor.current.copy(alpha = 0.75f)
                 )
                 Text(
-                    modifier = Modifier.offset(y = 3.dp),
-                    text = "glasses",
+                    modifier = Modifier.offset(y = 2.dp),
+                    text = if (consumedWaterGlasses <= 1) "glass" else "glasses",
                     fontFamily = Kanit,
-                    fontSize = 16.sp,
+                    fontSize = 15.451.sp,
                     color = LocalContentColor.current.copy(alpha = 0.85f)
                 )
                 Spacer(modifier = Modifier.weight(1f))
@@ -528,6 +547,7 @@ fun WaterCard(
     }
 }
 
+@OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun SleepCard(
     modifier: Modifier = Modifier,
@@ -553,7 +573,7 @@ fun SleepCard(
             Text(
                 text = "Hours of sleep",
                 style = ownTypography.titleLarge,
-                fontSize = 24.sp,
+                fontSize = 25.sp,
                 fontWeight = FontWeight.W600
             )
             Row(
@@ -571,7 +591,7 @@ fun SleepCard(
                     modifier = Modifier.offset(y = 3.dp),
                     text = "(Recommended)",
                     fontFamily = Kanit,
-                    fontSize = 16.sp,
+                    fontSize = 15.451.sp,
                     color = LocalContentColor.current.copy(alpha = 0.85f)
                 )
                 Spacer(modifier = Modifier.weight(1f))
@@ -593,6 +613,7 @@ fun SleepCard(
     }
 }
 
+@OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun CaloriesBurntCard(
     modifier: Modifier = Modifier,
@@ -618,7 +639,7 @@ fun CaloriesBurntCard(
             Text(
                 text = "Energy expended",
                 style = ownTypography.titleLarge,
-                fontSize = 24.sp,
+                fontSize = 25.sp,
                 fontWeight = FontWeight.W600
             )
             Text(
@@ -634,7 +655,7 @@ fun CaloriesBurntCard(
                 modifier = Modifier.fillMaxWidth()
             ) {
                 Column {
-                    Row (verticalAlignment = Alignment.CenterVertically) {
+                    Row(verticalAlignment = Alignment.CenterVertically) {
                         Text(
                             text = "$dailyCalories",
                             fontFamily = Bricolage,
@@ -643,26 +664,25 @@ fun CaloriesBurntCard(
                         Spacer(modifier = Modifier.size(3.dp))
                         Text(
                             text = "Cal",
+                            fontSize = 15.451.sp,
                             modifier = Modifier.offset(y = 3.dp),
                             style = ownTypography.bodyLarge,
                             color = LocalContentColor.current.copy(alpha = 0.8f)
                         )
                     }
-                    Text(text = "Today", fontFamily = Kanit)
+                    Text(
+                        text = "Today",
+                        fontFamily = Kanit
+                    )
                 }
 
-                Box (
+                Box(
                     modifier = Modifier
                         .size(width = 175.dp, height = 75.dp)
                         .background(Color.Red)
                 ) {
-
                 }
             }
         }
     }
 }
-
-
-
-

@@ -1,9 +1,11 @@
 package com.example.fitnessapp
 
+import android.os.Build
 import android.os.Bundle
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.activity.viewModels
+import androidx.annotation.RequiresApi
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -15,7 +17,6 @@ import androidx.compose.foundation.layout.offset
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
-import androidx.compose.material.ExperimentalMaterialApi
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Close
 import androidx.compose.material.icons.filled.Fastfood
@@ -29,9 +30,6 @@ import androidx.compose.material.icons.outlined.LocalFireDepartment
 import androidx.compose.material.icons.outlined.Menu
 import androidx.compose.material.icons.outlined.Settings
 import androidx.compose.material.icons.outlined.WaterDrop
-import androidx.compose.material.pullrefresh.PullRefreshIndicator
-import androidx.compose.material.pullrefresh.pullRefresh
-import androidx.compose.material.pullrefresh.rememberPullRefreshState
 import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.DrawerValue
 import androidx.compose.material3.ExperimentalMaterial3Api
@@ -51,36 +49,48 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableIntStateOf
-import androidx.compose.runtime.produceState
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.text.font.FontStyle
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import androidx.navigation.compose.currentBackStackEntryAsState
-import androidx.navigation.compose.rememberNavController
-import com.example.fitnessapp.data.remote.responses.Quotes
+import androidx.hilt.navigation.compose.hiltViewModel
+import androidx.lifecycle.ViewModelProvider
+import com.example.fitnessapp.data.StoreDayInfo
+import com.example.fitnessapp.repository.FitnessRepository
 import com.example.fitnessapp.ui.home_screen.HomeScreen
+import com.example.fitnessapp.ui.home_screen.HomeScreenViewModel
 import com.example.fitnessapp.ui.navigation_drawer.NavigationDrawerViewModel
 import com.example.fitnessapp.ui.navigation_drawer.NavigationItems
 import com.example.fitnessapp.ui.theme.FitnessAppTheme
 import com.example.fitnessapp.ui.theme.Kanit
 import com.example.fitnessapp.ui.theme.Kalam
-import com.example.fitnessapp.util.Resource
+import com.example.fitnessapp.worker.AndroidAlarmScheduler
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.launch
+import java.time.LocalDateTime
+import javax.inject.Inject
 
 @OptIn(ExperimentalMaterial3Api::class)
 @AndroidEntryPoint
 class MainActivity : ComponentActivity() {
-    
+
+    @Inject
+    lateinit var repository: FitnessRepository
+
+    @RequiresApi(Build.VERSION_CODES.O)
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
+
+        val scheduler = AndroidAlarmScheduler(this, repository)
+        scheduler.schedule()
+
         setContent {
             FitnessAppTheme {
                 val items = listOf(
@@ -144,13 +154,14 @@ class MainActivity : ComponentActivity() {
                                         quote = "Looks like you're in need of a virtual bridge to the digital realm." +
                                                 " Don't worry," +
                                                 " I'll be here whenever you're ready to reconnect.",
-                                        author = "Dev Team"
+                                        author = "Dev. team"
                                     )
                                 }
                                 if (isLoading) {
                                     Box(
                                         contentAlignment = Alignment.Center,
-                                        modifier = Modifier.fillMaxWidth()
+                                        modifier = Modifier
+                                            .fillMaxWidth()
                                             .height(100.dp)
                                     ) {
                                         CircularProgressIndicator()
@@ -304,14 +315,15 @@ fun MotivationalQuotes(
     Box(
         modifier
             .fillMaxWidth()
-            .padding(start = 30.dp, end = 20.dp, bottom = 20.dp)
+            .padding(start = 20.dp, end = 15.dp)
     ) {
         Column(modifier.fillMaxWidth()) {
             Text(
-                text = quote,
-                fontSize = 24.sp,
+                text = "\"$quote\"",
+                fontSize = 22.sp,
                 fontFamily = Kalam,
                 fontWeight = FontWeight.W400,
+                fontStyle = FontStyle.Italic,
                 color = MaterialTheme.colorScheme.onSurface
             )
             Text(
